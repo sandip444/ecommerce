@@ -1,32 +1,48 @@
-import React from 'react'
+import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const ProductComponent = () => {
   const products = useSelector((state) => state.allProducts.products);
 
-  const renderList = products.map((product)=>{
-    const { id, title, image, price, category } = product;
-    return(
-      <div className="four wide column" key={id}>
-      <Link to={`/product/${id}`}>
-        <div className="ui link cards">
-          <div className="card">
-            <div className="image">
-              <img src={image} alt={title} />
-            </div>
-            <div className="content">
-              <div className="header">{title}</div>
-              <div className="meta price">$ {price}</div>
-              <div className="meta">{category}</div>
-            </div>
+  if (!products.length) {
+    return (
+      <div className="empty-state">
+        <h3>Inventory is syncing...</h3>
+        <p>Hang tight while we load the latest sensor availability.</p>
+      </div>
+    );
+  }
+
+  const renderList = products.map((product) => {
+    const { id, title, image, price, category, stock, status } = product;
+    const availability = stock > 0 ? "Available" : "Backorder";
+
+    return (
+      <div className="product-card" key={id}>
+        <Link to={`/product/${id}`}>
+          <div className="product-card__image">
+            <img src={image} alt={title} />
           </div>
+        </Link>
+        <div className="product-card__body">
+          <div>
+            <p className="product-card__category">{category}</p>
+            <h3>{title}</h3>
+          </div>
+          <p className="product-card__price">$ {price}</p>
+          <div className="product-card__meta">
+            <span className="tag">{availability}</span>
+            <span className="muted">Stock: {stock}</span>
+            <span className="muted">{status}</span>
+          </div>
+          <Link className="primary-button product-card__cta" to={`/product/${id}`}>
+            View &amp; Purchase
+          </Link>
         </div>
-      </Link>
-    </div>
-    )
-  })
-  return <>{renderList}</>
-  
-}
-export default ProductComponent
+      </div>
+    );
+  });
+  return <>{renderList}</>;
+};
+export default ProductComponent;
